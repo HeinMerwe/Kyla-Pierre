@@ -51,7 +51,7 @@ h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
 .topnav{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;max-width:1060px;margin:0 auto;width:100%;padding-top:clamp(34px,6vh,56px)}
 .topnav ul{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:clamp(18px,5.6vw,72px)}
 .topnav ul:first-child{justify-content:flex-start;padding-left:clamp(0px,6vw,72px)}
-.topnav ul:last-child{justify-content:flex-end;padding-right:clamp(0px,6vw,72px)}
+.topnav ul:last-of-type{justify-content:flex-end;padding-right:clamp(0px,6vw,72px)}
 .topnav a{text-decoration:none;color:#FFFDF8;font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:6px 0;display:block}
 .topnav ul a:hover{text-decoration:underline;text-underline-offset:5px}
 .topnav .mono{display:block;width:clamp(62px,7.2vw,90px);padding:0!important;filter:drop-shadow(0 1px 8px rgba(0,0,0,.25))}
@@ -264,7 +264,7 @@ footer .credit{opacity:.55;margin-top:14px}
 }
 @media (max-width:560px){
   .topnav a{font-size:10px;letter-spacing:.04em}
-  .topnav ul:first-child,.topnav ul:last-child{justify-content:space-around;padding:0;gap:6px}
+  .topnav ul:first-child,.topnav ul:last-of-type{justify-content:space-around;padding:0;gap:6px}
   .topnav .mono{width:54px}
   .essentials{grid-template-columns:1fr}
   .essentials{gap:0}
@@ -697,8 +697,7 @@ function closeAllMeals(except){
 document.addEventListener("click", e => { if (!e.target.closest(".meal")) closeAllMeals(); });
 function renderGuests(){
   const n = +$("#f-count").value || 1;
-  while (guests.length < n) guests.push({ name: "", meal: -1, auto: guests.length === 0 });
-  if (guests[0].auto) guests[0].name = $("#f-name").value.trim();
+  while (guests.length < n) guests.push({ name: "", meal: -1 });
   const box = $("#guests"); box.innerHTML = "";
   for (let i = 0; i < n; i++) {
     const g = guests[i];
@@ -706,7 +705,7 @@ function renderGuests(){
     const head = el("p", "guest-no", `${t("guestNo")} ${i + 1}`);
     const nm = el("input"); nm.type = "text"; nm.id = "g-name-" + i; nm.className = "guest-name";
     nm.placeholder = t("phGuest"); nm.value = g.name; nm.setAttribute("aria-label", `${t("phGuest")}: ${t("guestNo")} ${i + 1}`);
-    nm.addEventListener("input", () => { g.name = nm.value; if (i === 0) g.auto = false; });
+    nm.addEventListener("input", () => { g.name = nm.value; });
     row.append(head, nm, mealPicker(g, i));
     box.append(row);
   }
@@ -714,10 +713,6 @@ function renderGuests(){
 }
 for (let i = 1; i <= WEDDING.maxGuests; i++) { const o = el("option", null, i); o.value = i; $("#f-count").append(o); }
 $("#f-count").addEventListener("change", renderGuests);
-// Guest 1 follows the name typed at the top until the guest changes it
-$("#f-name").addEventListener("input", () => {
-  if (guests[0] && guests[0].auto) { guests[0].name = $("#f-name").value.trim(); const g0 = $("#g-name-0"); if (g0) g0.value = guests[0].name; }
-});
 
 // ---------- RSVP ----------
 $$('input[name="attend"]').forEach(r => r.addEventListener("change", () => {
